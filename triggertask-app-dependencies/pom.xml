@@ -6,7 +6,7 @@
     <version>1.1.0.BUILD-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>triggertask-app-dependencies</name>
-    <description>Spring Cloud Stream Trigger App Dependencies</description>
+    <description>Spring Cloud Stream Trigger Task App Dependencies</description>
 
     <parent>
         <groupId>org.springframework.cloud.stream.app</groupId>
@@ -24,29 +24,4 @@
         </dependencies>
     </dependencyManagement>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.springframework.cloud</groupId>
-                <artifactId>spring-cloud-app-starter-doc-maven-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.springframework.cloud.stream.app.plugin</groupId>
-                <artifactId>spring-cloud-stream-app-maven-plugin</artifactId>
-                <configuration>
-                    <generatedProjectHome>${session.executionRootDirectory}/apps</generatedProjectHome>
-                    <generatedProjectVersion>${project.version}</generatedProjectVersion>
-                    <bom>
-                        <name>scs-bom</name>
-                        <groupId>org.springframework.cloud.stream.app</groupId>
-                        <artifactId>trigger-app-dependencies</artifactId>
-                        <version>${project.version}</version>
-                    </bom>
-                    <generatedApps>
-                        <triggertask-source />
-                    </generatedApps>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
 </project>
