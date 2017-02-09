@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 the original author or authors.
+ * Copyright 2016-2017 the original author or authors.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -27,23 +27,22 @@ import org.junit.runner.RunWith;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.test.IntegrationTest;
-import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.boot.test.WebIntegrationTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.stream.annotation.Bindings;
 import org.springframework.cloud.stream.messaging.Source;
 import org.springframework.cloud.stream.test.binder.MessageCollector;
 import org.springframework.cloud.task.launcher.TaskLaunchRequest;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.junit4.SpringRunner;
 
 /**
  * Triggertask source tests.
  * @author Glenn Renfro
+ * @author Thomas Risberg
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = TriggertaskSourceTests.TriggerTaskSourceApplication.class)
-@WebIntegrationTest(randomPort = true)
+@RunWith(SpringRunner.class)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
 @DirtiesContext
 public abstract class TriggertaskSourceTests {
 
@@ -75,6 +74,10 @@ public abstract class TriggertaskSourceTests {
 
 	private static final String PROP_PREFIX = "prop.";
 
+	private static final String APP_NAME_KEY = "triggertask.applicationName=";
+
+	private static final String APP_NAME = "foo";
+
 	private static final Map<String, String> environmentPropertyMap = new HashMap<>();
 	static
 	{
@@ -100,10 +103,11 @@ public abstract class TriggertaskSourceTests {
 	@Autowired
 	protected MessageCollector messageCollector;
 
-	@IntegrationTest({FIXED_DELAY, INITIAL_DELAY, URI_KEY + BASE_URI,
+	@TestPropertySource(properties = {FIXED_DELAY, INITIAL_DELAY, URI_KEY + BASE_URI,
 			COMMAND_LINE_ARGS_KEY + COMMAND_LINE_ARGS,
 			ENVIRONMENT_PROPERTIES_KEY + ENVIRONMENT_PROPERTIES,
-			DEPLOYMENT_PROPERTIES_KEY + DEPLOYMENT_PROPERTIES})
+			DEPLOYMENT_PROPERTIES_KEY + DEPLOYMENT_PROPERTIES,
+			APP_NAME_KEY + APP_NAME})
 	public static class FixedDelayTest extends TriggertaskSourceTests {
 
 		@Test
@@ -128,7 +132,7 @@ public abstract class TriggertaskSourceTests {
 		}
 	}
 
-	@IntegrationTest({FIXED_DELAY, INITIAL_DELAY, URI_KEY + BASE_URI})
+	@TestPropertySource(properties = {FIXED_DELAY, INITIAL_DELAY, URI_KEY + BASE_URI})
 	public static class FixedDelayTestNoArgumentsTest extends TriggertaskSourceTests {
 
 		@Test
@@ -139,7 +143,7 @@ public abstract class TriggertaskSourceTests {
 		}
 	}
 
-	@IntegrationTest({FIXED_DELAY, INITIAL_DELAY})
+	@TestPropertySource(properties = {FIXED_DELAY, INITIAL_DELAY})
 	public static class MissingURITest extends TriggertaskSourceTests {
 
 		@Test(expected = NullPointerException.class)
@@ -148,7 +152,7 @@ public abstract class TriggertaskSourceTests {
 		}
 	}
 
-	@IntegrationTest({FIXED_DELAY, INITIAL_DELAY, URI_KEY + BASE_URI})
+	@TestPropertySource(properties = {FIXED_DELAY, INITIAL_DELAY, URI_KEY + BASE_URI})
 	public static class FixedDelayEmptyPayloadTest extends TriggertaskSourceTests {
 
 		@Test
@@ -159,7 +163,7 @@ public abstract class TriggertaskSourceTests {
 		}
 	}
 
-	@IntegrationTest({"trigger.cron = 0/2 * * * * *", CRON_DELAY, URI_KEY + CRON_URI})
+	@TestPropertySource(properties = {"trigger.cron = 0/2 * * * * *", CRON_DELAY, URI_KEY + CRON_URI})
 	public static class CronTriggerTest extends TriggertaskSourceTests {
 
 		@Test

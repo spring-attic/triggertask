@@ -17,6 +17,7 @@ $$trigger.initial-delay$$:: $$Initial delay for periodic triggers.$$ *($$Integer
 $$trigger.max-messages$$:: $$Maximum messages per poll, -1 means infinity.$$ *($$Long$$, default: `$$1$$`)*
 $$trigger.source.payload$$:: $$The expression for the payload of the Source module.$$ *($$Expression$$, default: `$$<none>$$`)*
 $$trigger.time-unit$$:: $$The TimeUnit to apply to delay values.$$ *($$TimeUnit$$, default: `$$<none>$$`, possible values: `NANOSECONDS`,`MICROSECONDS`,`MILLISECONDS`,`SECONDS`,`MINUTES`,`HOURS`,`DAYS`)*
+$$triggertask.application-name$$:: $$The name to be applied to the launched task..$$ *($$String$$, default: `$$<empty string>$$`)*
 $$triggertask.command-line-args$$:: $$Space delimited key=value pairs to be used as commandline variables for the task.$$ *($$String$$, default: `$$<empty string>$$`)*
 $$triggertask.deployment-properties$$:: $$Comma delimited key=value pairs to be used as deploymentProperties for the task.$$ *($$String$$, default: `$$<empty string>$$`)*
 $$triggertask.environment-properties$$:: $$Comma delimited key=value pairs to be used as environmentProperties for the task.$$ *($$String$$, default: `$$<empty string>$$`)*

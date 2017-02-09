@@ -73,7 +73,8 @@ public class TriggertaskSourceConfiguration {
 						commandLineArgumentTransformer.transform(
 								taskPayloadProperties.getCommandLineArgs())),
 				parseProperties(taskPayloadProperties.getEnvironmentProperties()),
-				parseProperties(taskPayloadProperties.getDeploymentProperties()));
+				parseProperties(taskPayloadProperties.getDeploymentProperties()),
+				taskPayloadProperties.getApplicationName());
 	}
 
 	/**

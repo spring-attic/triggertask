@@ -50,6 +50,11 @@ public class TaskPayloadProperties {
 	 */
 	private String deploymentProperties = "";
 
+	/**
+	 * The name to be applied to the launched task..
+	 */
+	private String applicationName = "";
+
 	public String getCommandLineArgs() {
 		return commandLineArgs;
 	}
@@ -83,4 +88,11 @@ public class TaskPayloadProperties {
 		this.deploymentProperties = deploymentProperties;
 	}
 
+	public String getApplicationName() {
+		return applicationName;
+	}
+
+	public void setApplicationName(String applicationName) {
+		this.applicationName = applicationName;
+	}
 }
