@@ -29,13 +29,23 @@ A trigger task is a source that  dispatches `TaskLaunchRequest` messages that wi
 tasklauncher-* sink. The tasklauncher-* sink will then deploy a task and launch it.  An example of this using Spring
 Cloud Data Flow would look like this:
 
-`stream create foo --definition "triggertask --uri=maven://org.springframework.cloud.task.app:timestamp-task:jar:1.0.0.BUILD-SNAPSHOT --fixed-delay=5 | tasklauncher-local"`
+```
+stream create foo --definition "triggertask --uri=maven://org.springframework.cloud.task.app:timestamp-task:jar:1.1.0.RELEASE --fixed-delay=5 | task-launcher-local"  --deploy
+```
 
 In the case above the tasklauncher-local will receive the `TaskLaunchRequest` and launch the task enumerated in the --uri
 property using the Spring Cloud Local Deployer.
 
 The only required property for the triggertask is the --uri which specifies the artifact that will be launched by the
 tasklauncher-* that you have selected.
+
+NOTE: When using the tasklauncher-* and the URI uses maven as the resource
+please be sure to set the `--maven.remote-repositories` property for the
+tasklauncher-*, if the jar is not in your local repository.  For example:
+
+```
+stream create foo --definition "triggertask --uri=maven://org.springframework.cloud.task.app:timestamp-task:jar:1.0.1.RELEASE --fixed-delay=5 | task-launcher-local --maven.remote-repositories.repo1.url=http://repo.spring.io/libs-snapshot" --deploy
+```
 
 //end::ref-doc[]
 == Build
