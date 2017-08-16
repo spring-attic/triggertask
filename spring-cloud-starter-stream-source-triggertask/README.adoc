@@ -1,10 +1,28 @@
 //tag::ref-doc[]
 = TriggerTask Source
 
-The TriggerTask app sends a `TaskLaunchRequest` based on a fixed delay, date or cron expression. The user is allowed
-to set the command line arguments as well as the
+The TriggerTask app sends a `TaskLaunchRequest` based on a fixed delay, date or
+cron expression.  The `TaskLaunchRequest` is used by a tasklauncher-* sink that
+will deploy and launch a task.  The only required property for the triggertask
+is the --uri which specifies the artifact that will be launched by the
+tasklauncher-* that you have selected. The user is also allowed to set the
+command line arguments as well as the
 http://docs.spring.io/spring-boot/docs/current/reference/html/boot-features-external-config.html[Spring Boot properties]
 that are used by the task.
+
+== Input
+
+N/A
+
+== Output
+
+=== Headers:
+
+* `Content-Type: application/octet-stream`
+
+=== Payload:
+
+A  byte array containing the `TaskLaunchRequest`
 
 == Options
 The **$$triggertask$$** $$source$$ has the following options:
@@ -24,32 +42,24 @@ $$triggertask.environment-properties$$:: $$Comma delimited key=value pairs to be
 $$triggertask.uri$$:: $$The uri to the task artifact.$$ *($$String$$, default: `$$<empty string>$$`)*
 //end::configuration-properties[]
 
-== Using the triggertask
-A trigger task is a source that  dispatches `TaskLaunchRequest` messages that will eventually be consumed by a
-tasklauncher-* sink. The tasklauncher-* sink will then deploy a task and launch it.  An example of this using Spring
-Cloud Data Flow would look like this:
 
-```
-stream create foo --definition "triggertask --uri=maven://org.springframework.cloud.task.app:timestamp-task:jar:1.1.0.RELEASE --fixed-delay=5 | task-launcher-local"  --deploy
-```
-
-In the case above the tasklauncher-local will receive the `TaskLaunchRequest` and launch the task enumerated in the --uri
-property using the Spring Cloud Local Deployer.
-
-The only required property for the triggertask is the --uri which specifies the artifact that will be launched by the
-tasklauncher-* that you have selected.
-
-NOTE: When using the tasklauncher-* and the URI uses maven as the resource
-please be sure to set the `--maven.remote-repositories` property for the
-tasklauncher-*, if the jar is not in your local repository.  For example:
-
-```
-stream create foo --definition "triggertask --uri=maven://org.springframework.cloud.task.app:timestamp-task:jar:1.0.1.RELEASE --fixed-delay=5 | task-launcher-local --maven.remote-repositories.repo1.url=http://repo.spring.io/libs-snapshot" --deploy
-```
-
-//end::ref-doc[]
 == Build
 
 ```
-$ mvn clean package
+$ ./mvnw clean install -PgenerateApps
+$ cd apps
+
+You can find the corresponding binder based projects here. You can then cd into one one of the folders and
+build it:
+
+$ ./mvnw clean package
 ```
+
+
+=== Examples
+
+```
+java -jar trigger_task.jar --triggertask.uri=maven://org.springframework.cloud.task.app:timestamp-task:1.2.0.RELEASE
+```
+
+//end::ref-doc[]
