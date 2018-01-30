@@ -16,25 +16,26 @@
 
 package org.springframework.cloud.stream.app.triggertask.source;
 
-import static org.junit.Assert.assertEquals;
-
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.cloud.stream.annotation.Bindings;
 import org.springframework.cloud.stream.messaging.Source;
 import org.springframework.cloud.stream.test.binder.MessageCollector;
 import org.springframework.cloud.task.launcher.TaskLaunchRequest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Triggertask source tests.
@@ -96,8 +97,9 @@ public abstract class TriggertaskSourceTests {
 
 	}
 
+	private static final ObjectMapper objectMapper = new ObjectMapper();
+
 	@Autowired
-	@Bindings(TriggertaskSourceConfiguration.class)
 	protected Source triggerSource;
 
 	@Autowired
@@ -111,23 +113,18 @@ public abstract class TriggertaskSourceTests {
 	public static class FixedDelayTest extends TriggertaskSourceTests {
 
 		@Test
-		public void fixedDelayTest() throws InterruptedException {
-			TaskLaunchRequest tlr = (TaskLaunchRequest) messageCollector.forChannel(triggerSource.output()).poll(2100, TimeUnit.MILLISECONDS).getPayload();
-			assertEquals(BASE_URI, tlr.getUri());
+		public void fixedDelayTest() throws InterruptedException, IOException {
+			String result = (String) messageCollector.forChannel(triggerSource.output()).poll(2100, TimeUnit.MILLISECONDS).getPayload();
+			TaskLaunchRequest tlr = objectMapper.readValue(result, TaskLaunchRequest.class);
+			assertThat(tlr.getUri()).isEqualTo(BASE_URI);
 			checkConfigurationSize(3, 3, 3, tlr);
 
 			for (int i = 0; i < 3; i++) {
-				assertEquals(String.format("the expected environment property for %s was %s but expected %s",
-						PROP_PREFIX + i, tlr.getEnvironmentProperties().get(PROP_PREFIX + i), environmentPropertyMap.get(PROP_PREFIX + i )),
-						environmentPropertyMap.get(PROP_PREFIX + i ), tlr.getEnvironmentProperties().get(PROP_PREFIX + i));
+				assertThat(tlr.getEnvironmentProperties().get(PROP_PREFIX + i)).isEqualTo(environmentPropertyMap.get(PROP_PREFIX + i ));
 
-				assertEquals(String.format("the expected deployment property for %s was %s but expected %s",
-						PROP_PREFIX + i, tlr.getDeploymentProperties().get(PROP_PREFIX + i), deploymentPropertyMap.get(PROP_PREFIX + i )),
-						deploymentPropertyMap.get(PROP_PREFIX + i ), tlr.getDeploymentProperties().get(PROP_PREFIX + i));
+				assertThat(tlr.getDeploymentProperties().get(PROP_PREFIX + i)).isEqualTo(deploymentPropertyMap.get(PROP_PREFIX + i ));
 
-				assertEquals(String.format("the expected commandLineArg was %s but expected param%s", i,
-						tlr.getCommandlineArguments().get(i), PARAMS[i]),
-						PARAMS[i], tlr.getCommandlineArguments().get(i));
+				assertThat(tlr.getCommandlineArguments().get(i)).isEqualTo(PARAMS[i]);
 			}
 		}
 	}
@@ -136,9 +133,10 @@ public abstract class TriggertaskSourceTests {
 	public static class FixedDelayTestNoArgumentsTest extends TriggertaskSourceTests {
 
 		@Test
-		public void fixedDelayNoCommantLineArgumentsTest() throws InterruptedException {
-			TaskLaunchRequest tlr = (TaskLaunchRequest) messageCollector.forChannel(triggerSource.output()).poll(2100, TimeUnit.MILLISECONDS).getPayload();
-			assertEquals(BASE_URI, tlr.getUri());
+		public void fixedDelayNoCommandLineArgumentsTest() throws InterruptedException, IOException {
+			String result = (String) messageCollector.forChannel(triggerSource.output()).poll(2100, TimeUnit.MILLISECONDS).getPayload();
+			TaskLaunchRequest tlr = objectMapper.readValue(result, TaskLaunchRequest.class);
+			assertThat(tlr.getUri()).isEqualTo(BASE_URI);
 			checkConfigurationSize(0, 0, 0, tlr);
 		}
 	}
@@ -148,18 +146,7 @@ public abstract class TriggertaskSourceTests {
 
 		@Test(expected = NullPointerException.class)
 		public void MissingURITest() throws InterruptedException {
-			TaskLaunchRequest tlr = (TaskLaunchRequest) messageCollector.forChannel(triggerSource.output()).poll(2100, TimeUnit.MILLISECONDS).getPayload();
-		}
-	}
-
-	@TestPropertySource(properties = {FIXED_DELAY, INITIAL_DELAY, URI_KEY + BASE_URI})
-	public static class FixedDelayEmptyPayloadTest extends TriggertaskSourceTests {
-
-		@Test
-		public void fixedDelayTest() throws InterruptedException {
-			TaskLaunchRequest tlr = (TaskLaunchRequest) messageCollector.forChannel(triggerSource.output()).poll(2100, TimeUnit.MILLISECONDS).getPayload();
-			assertEquals(BASE_URI, tlr.getUri());
-			checkConfigurationSize(0, 0, 0, tlr);
+			messageCollector.forChannel(triggerSource.output()).poll(2100, TimeUnit.MILLISECONDS).getPayload();
 		}
 	}
 
@@ -167,11 +154,13 @@ public abstract class TriggertaskSourceTests {
 	public static class CronTriggerTest extends TriggertaskSourceTests {
 
 		@Test
-		public void cronTriggerTest() throws InterruptedException {
-			TaskLaunchRequest tlr = (TaskLaunchRequest) messageCollector.forChannel(triggerSource.output()).poll(2100, TimeUnit.MILLISECONDS).getPayload();
-			assertEquals(CRON_URI, tlr.getUri());
-			tlr = (TaskLaunchRequest) messageCollector.forChannel(triggerSource.output()).poll(2100, TimeUnit.MILLISECONDS).getPayload();
-			assertEquals(CRON_URI, tlr.getUri());
+		public void cronTriggerTest() throws InterruptedException, IOException {
+			String result = (String) messageCollector.forChannel(triggerSource.output()).poll(2100, TimeUnit.MILLISECONDS).getPayload();
+			TaskLaunchRequest tlr = objectMapper.readValue(result, TaskLaunchRequest.class);
+			assertThat(tlr.getUri()).isEqualTo(CRON_URI);
+			result = (String) messageCollector.forChannel(triggerSource.output()).poll(2100, TimeUnit.MILLISECONDS).getPayload();
+			tlr = objectMapper.readValue(result, TaskLaunchRequest.class);
+			assertThat(tlr.getUri()).isEqualTo(CRON_URI);
 			checkConfigurationSize(0, 0, 0, tlr);
 		}
 	}
@@ -182,8 +171,8 @@ public abstract class TriggertaskSourceTests {
 	}
 
 	private static void checkConfigurationSize(int commandLineArgSize, int environmentPropertySize, int deploymentPropertySize, TaskLaunchRequest tlr) {
-		assertEquals(String.format("expected %d commandLineArgs", commandLineArgSize), commandLineArgSize, tlr.getCommandlineArguments().size());
-		assertEquals(String.format("expected %d environmentProperties", environmentPropertySize), environmentPropertySize, tlr.getEnvironmentProperties().size());
-		assertEquals(String.format("expected %d deploymentProperties", deploymentPropertySize), deploymentPropertySize, tlr.getDeploymentProperties().size());
+		assertThat(tlr.getCommandlineArguments().size()).isEqualTo(commandLineArgSize);
+		assertThat(tlr.getEnvironmentProperties().size()).isEqualTo(environmentPropertySize);
+		assertThat(tlr.getDeploymentProperties().size()).isEqualTo(deploymentPropertySize);
 	}
 }
