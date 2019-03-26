@@ -7,7 +7,7 @@ will deploy and launch a task.  The only required property for the triggertask
 is the --uri which specifies the artifact that will be launched by the
 tasklauncher-* that you have selected. The user is also allowed to set the
 command line arguments as well as the
-http://docs.spring.io/spring-boot/docs/current/reference/html/boot-features-external-config.html[Spring Boot properties]
+https://docs.spring.io/spring-boot/docs/current/reference/html/boot-features-external-config.html[Spring Boot properties]
 that are used by the task.
 
 == Input
