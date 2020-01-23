@@ -1,5 +1,8 @@
 # TriggerTask Source
 
+WARNING: Deprecated. This is intended for use with components that are no longer supported. See https://github.com/spring-cloud-stream-app-starters/tasklauncher-dataflow.
+
+
 To learn more about this application and the supported properties, please review the following link.
 
 include::spring-cloud-starter-stream-source-triggertask/README.adoc[]
