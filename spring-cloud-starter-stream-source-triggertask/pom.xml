@@ -59,6 +59,7 @@
 					<generatedApps>
 						<triggertask-source />
 					</generatedApps>
+					<enableContainerImageMetadata>true</enableContainerImageMetadata>
 				</configuration>
 			</plugin>
 		</plugins>
